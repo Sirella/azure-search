@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\app",
+    "\\app\\backend",
+    "\\app\\backend\\approaches",
+    "\\app\\backend\\approaches\\prompts",
+    "\\app\\backend\\prepdocslib",
+    "\\app\\frontend\\src",
+    "\\app\\frontend\\src\\components",
+    "\\app\\frontend\\src\\components\\Example",
+    "\\app\\frontend\\src\\components\\GPT4VSettings"
+  ],
+  "SelectedNode": "\\app\\backend\\approaches\\promptmanager.py",
+  "PreviewInSolutionExplorer": false
+}
