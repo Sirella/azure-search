@@ -12,7 +12,7 @@
             "retrieval_mode": "hybrid",
             "semantic_ranker": true,
             "semantic_captions": false,
-            "suggest_followup_questions": false,
+            "suggest_followup_questions": true,
             "use_oid_security_filter": false,
             "use_groups_security_filter": false,
             "vector_fields": [

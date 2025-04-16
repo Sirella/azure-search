@@ -1,4 +1,5 @@
 from typing import Any, Coroutine, List, Literal, Optional, Union, overload
+import time
 
 from azure.search.documents.aio import SearchClient
 from azure.search.documents.models import VectorQuery
@@ -104,7 +105,7 @@ class ChatReadRetrieveReadApproach(ChatApproach):
         tools: List[ChatCompletionToolParam] = self.query_rewrite_tools
 
         # STEP 1: Generate an optimized keyword search query based on the chat history and the last question
-        query_response_token_limit = 100
+        query_response_token_limit = 200
         query_messages = build_messages(
             model=self.chatgpt_model,
             system_prompt=rendered_query_prompt.system_content,
@@ -126,7 +127,7 @@ class ChatReadRetrieveReadApproach(ChatApproach):
             tools=tools,
             seed=seed,
         )
-
+        
         query_text = self.get_search_query(chat_completion, original_user_query)
 
         # STEP 2: Retrieve relevant documents from the search index with the GPT optimized query
@@ -212,14 +213,60 @@ class ChatReadRetrieveReadApproach(ChatApproach):
             ],
         }
 
-        chat_coroutine = self.openai_client.chat.completions.create(
-            # Azure OpenAI takes the deployment name as the model name
-            model=self.chatgpt_deployment if self.chatgpt_deployment else self.chatgpt_model,
-            messages=messages,
+        chat_coroutine = await self.openai_client.beta.assistants.create(
+            model=self.chatgpt_deployment if self.chatgpt_deployment else self.chatgpt_model,  # replace with model deployment name
+            name="Assistant45",
+            instructions="rendered_answer_prompt.system_content",
+            tools=[{"type":"code_interpreter"}]
+            ,tool_resources={"code_interpreter":{"file_ids":[]}},
             temperature=overrides.get("temperature", 0.3),
-            max_tokens=response_token_limit,
-            n=1,
-            stream=should_stream,
-            seed=seed,
+            top_p=1
         )
+
+        # Create a thread
+        thread = self.openai_client.beta.threads.create()
+
+        # Add a user question to the thread
+        message = self.openai_client.beta.threads.messages.create(
+          thread_id=thread.id,
+          role="user",
+          content=messages # Replace this with your prompt
+        )
+
+        # Run the thread
+        run = self.openai_client.beta.threads.runs.create(
+          thread_id=thread.id,
+          assistant_id=assistant.id
+        )
+
+        # Looping until the run completes or fails
+        while run.status in ['queued', 'in_progress', 'cancelling']:
+          time.sleep(1)
+          run = self.openai_client.beta.threads.runs.retrieve(
+            thread_id=thread.id,
+            run_id=run.id
+          )
+
+        if run.status == 'completed':
+          messages = self.openai_client.beta.threads.messages.list(
+            thread_id=thread.id
+          )
+          print(messages)
+        elif run.status == 'requires_action':
+          # the assistant requires calling some functions
+          # and submit the tool outputs back to the run
+          pass
+        else:
+          print(run.status)
+
+        #chat_coroutine = self.openai_client.chat.completions.create(
+            # Azure OpenAI takes the deployment name as the model name
+        #    model=self.chatgpt_deployment if self.chatgpt_deployment else self.chatgpt_model,
+        #    messages=messages,
+        #    temperature=overrides.get("temperature", 0.3),
+        #    max_tokens=response_token_limit,
+        #    n=1,
+        #    stream=should_stream,
+        #    seed=seed,
+        #)
         return (extra_info, chat_coroutine)

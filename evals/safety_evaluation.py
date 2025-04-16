@@ -69,7 +69,7 @@ async def callback(
                 "retrieval_mode": "hybrid",
                 "semantic_ranker": True,
                 "semantic_captions": False,
-                "suggest_followup_questions": False,
+                "suggest_followup_questions": True,
                 "use_oid_security_filter": False,
                 "use_groups_security_filter": False,
                 "vector_fields": ["embedding"],

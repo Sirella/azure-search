@@ -1,16 +1,18 @@
 {
   "ExpandedNodes": [
     "",
+    "\\.azdo\\pipelines",
+    "\\.azure",
+    "\\.azure\\CHATBOT",
     "\\app",
-    "\\app\\backend",
-    "\\app\\backend\\approaches",
-    "\\app\\backend\\approaches\\prompts",
-    "\\app\\backend\\prepdocslib",
+    "\\app\\frontend",
     "\\app\\frontend\\src",
     "\\app\\frontend\\src\\components",
-    "\\app\\frontend\\src\\components\\Example",
-    "\\app\\frontend\\src\\components\\GPT4VSettings"
+    "\\app\\frontend\\src\\components\\Settings",
+    "\\docs",
+    "\\evals",
+    "\\infra"
   ],
-  "SelectedNode": "\\app\\backend\\approaches\\promptmanager.py",
+  "SelectedNode": "\\.azure\\CHATBOT\\.env",
   "PreviewInSolutionExplorer": false
 }
